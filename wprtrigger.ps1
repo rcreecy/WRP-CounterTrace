@@ -12,6 +12,10 @@
     -profile: Profile to use for WPR (i.e. "CPU", "NETWORK")*
 
     * Adheres to WPR command line documentation
+
+.EXAMPLE
+    .\wprtrigger.ps1 -counter "\Processor(0)\% Processor Time" -overunder over -runtime 60 -sampleinterval 5 -profile CPU -maxsamples 3
+
 .NOTES
     File Name: wprtrigger.ps1
     File Author: Ryan Creecy
@@ -23,6 +27,8 @@
 param( # Start parameters for script execution and job setup
     [Parameter(Mandatory=$true)]
     [string]$counter = "",
+    [Parameter(Mandatory=$true)]
+    [int]$threshold = "",
     [Parameter(Mandatory=$true)]
     [string]$overunder = "",
     [Parameter(Mandatory=$true)]
@@ -52,13 +58,14 @@ Function Threshold-Value(){ # Validates -overunder parameter
 
 Function Counter-Watch(){ # Uses CLI parameters -counter and -sample interval
     Try{
-        [array]$counterstack = Get-Counter -Counter $counter -SampleInterval $sampleinterval -MaxSamples $maxsamples
-        $counterarray = ForEach-Object {$_.CounterSamples[0].CookedValue} 
-        Write-Host $counterarray
+        [array]$counterstack = Get-Counter -Counter $counter -SampleInterval $sampleinterval -MaxSamples $maxsamples | ForEach-Object {$_.CounterSamples[0].CookedValue}
+        Write-Host $counterstack
     }
     Catch{
         Write-Host "Establishing counter values failed - It's possible the Counter used is invalid" -ForegroundColor Red
     }
 }
 
+$countertime = $sampleinterval * $maxsamples
+Write-Host "Counter watching will occur for $($countertime)s, with -sampleinterval set to $($sampleinterval)s and -maxsamples set to $($maxsampleS)"
 & Counter-Watch
