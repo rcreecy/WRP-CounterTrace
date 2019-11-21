@@ -13,7 +13,7 @@
     * Adheres to WPR command line documentation
 .NOTES
     File Name: wprtrigger.ps1
-    File Author: Ryan Creecy, McAfee Technical Support Team - Dynamic Endpoint
+    File Author: Ryan Creecy
 
 .LINK
     https://docs.microsoft.com/en-us/windows-hardware/test/wpt/wpr-command-line-options
