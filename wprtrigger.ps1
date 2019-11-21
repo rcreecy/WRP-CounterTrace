@@ -14,7 +14,7 @@
     * Adheres to WPR command line documentation
 
 .EXAMPLE
-    .\wprtrigger.ps1 -counter "\Processor(0)\% Processor Time" -overunder over -runtime 60 -sampleinterval 5 -profile CPU -maxsamples 3
+    .\wprtrigger.ps1 -counter "\Processor(0)\% Processor Time" -overunder over -runtime 60 -sampleinterval 1 -profile CPU -maxsamples 5 -threshold 90
 
 .NOTES
     File Name: wprtrigger.ps1
@@ -58,8 +58,9 @@ Function Threshold-Value(){ # Validates -overunder parameter
 
 Function Counter-Watch(){ # Uses CLI parameters -counter and -sample interval
     Try{
-        [array]$counterstack = Get-Counter -Counter $counter -SampleInterval $sampleinterval -MaxSamples $maxsamples | ForEach-Object {$_.CounterSamples[0].CookedValue}
-        Write-Host $counterstack
+        [array]$counterstack = ForEach-Object {Get-Counter -Counter $counter -SampleInterval $sampleinterval -MaxSamples $maxsamples}
+        [array]$counterstackvalue = ForEach-Object {$counterstack.CounterSamples.CookedValue}
+        return $counterstackvalue
     }
     Catch{
         Write-Host "Establishing counter values failed - It's possible the Counter used is invalid" -ForegroundColor Red
